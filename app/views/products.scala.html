@@ -1,0 +1,31 @@
+@(products: java.util.List[io.prismic.Document], title: String)
+
+@main(id = "products", title = Some("Our produts")) {
+
+  <section id="catalog">
+
+    @Option(title).map { txt => <h1>@txt</h1> }
+  
+    <div class="products">
+    
+      <ul>
+        @products.sortBy(_.getText("product.name")).map { product =>
+          <li data-category="@product.getTags().filter(Application.ProductCategories.contains).headOption">
+            <a href="@routes.Application.productDetail(product.getId(), product.getSlug(), prismic.maybeRef())">
+              <img src="@(Option(product.getImage("product.image", "icon")).map(_.getUrl()).getOrElse(routes.Assets.at("images/missing-image.png")))">
+              <span>@Option(product.getText("product.name")).getOrElse("Product")</span>
+              <em>@Option(product.getNumber("product.price", "$0.00")).getOrElse("–")</em>
+            </a>
+          </li>
+        }
+      </ul>
+
+    </div>
+
+    <p>
+      <a href="@routes.Application.index(prismic.maybeRef())">Close the products list</a>
+    </p>
+
+  </section>
+
+}

@@ -1,0 +1,21 @@
+@(id: String)(title: Option[String], image: Option[String] = None, catcher: Option[Html] = None)(body: Html)
+
+@main(id = id, title = title) {
+
+  <section id="page-header">
+
+    <div style="@image.map(url => s"background-image: url($url)")">
+      <div>
+        <h1>@title</h1>
+
+        @catcher
+      </div>
+    </div>
+
+  </section>
+
+  <section id="page-body">
+    @body
+  </section>
+
+}

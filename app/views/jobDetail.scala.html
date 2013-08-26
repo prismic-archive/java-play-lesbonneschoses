@@ -1,0 +1,15 @@
+@(main: io.prismic.Document, job: io.prismic.Document)
+
+@page(id = "job")(
+  title = Option(job.getText("job-offer.name")), 
+  image = Option(main.getImage("article.image", "main")).map(_.getUrl())) {
+
+  <h2>About you</h2>
+
+  @Option(job.getHtml("job-offer.profile", prismic.getLinkResolver())).map(Html.apply)
+
+  <h2>Your responsibilities</h2>
+
+  @Option(job.getHtml("job-offer.job_description", prismic.getLinkResolver())).map(Html.apply)
+
+}

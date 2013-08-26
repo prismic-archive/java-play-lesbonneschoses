@@ -1,0 +1,44 @@
+@(main: io.prismic.Document, jobs: java.util.List[io.prismic.Document])
+
+@page(id = "jobs")(
+  title = Option(main.getText("article.title")), 
+  image = Option(main.getImage("article.image", "main")).map(_.getUrl()), 
+  catcher = Option(main.getHtml("article.short_lede", prismic.getLinkResolver())).map(Html.apply)) {
+
+  <div class="presentation">
+    @Option(main.getHtml("article.content", prismic.getLinkResolver())).map(Html.apply)
+  </div>
+
+
+  @jobs.groupBy(_.getText("job-offer.service")).map { 
+
+    case (service, jobs) => {
+
+      <h2>
+        @service match {
+          case "Store" => { Positions in our Stores }
+          case "Office" => { Positions in our Offices }
+          case "Workshop" => { Positions in our Workshops }
+          case _ => { Other positions }
+        }
+      </h2>
+
+      <div class="listing">
+      @jobs.map { job =>
+        <div class="job">
+          <a href="@routes.Application.jobDetail(job.getId(), job.getSlug(), prismic.maybeRef())">
+            <h3>@job.getText("job-offer.name")</h3>
+            <p>
+              @Option(job.getStructuredText("job-offer.profile")).flatMap(d => Option(d.getFirstParagraph())).map(_.getText())
+            </p>
+            <strong>Learn more</strong>
+          </a>
+        </div>
+      }
+      </div>
+
+    }
+
+  }
+
+}

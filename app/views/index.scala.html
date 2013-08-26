@@ -1,0 +1,86 @@
+@(products: java.util.List[io.prismic.Document], featured: java.util.List[io.prismic.Document])
+
+@main(id = "home") {
+
+  <section id="caroussel">
+
+    <nav>
+      <ul>
+        @for(category <- Application.ProductCategories.values()) {
+           <li><a>@category</a></li>
+        }
+      </ul>
+    </nav>
+
+    <div class="products">
+
+      @for(category <- Application.ProductCategories.keys) {
+        <ul>
+          @products.filter(_.getTags().contains(category)).filterNot(_.getTags().contains("Featured")).take(5).map { product =>
+            <li data-category="@category">
+              <a href="@routes.Application.productDetail(product.getId(), product.getSlug(), prismic.maybeRef())">
+                <img src="@(Option(product.getImage("product.image", "icon")).map(_.getUrl()).getOrElse(routes.Assets.at("images/missing-image.png")))">
+                <span>@Option(product.getText("product.name")).getOrElse("Product")</span>
+                <em>@Option(product.getNumber("product.price", "$0.00")).getOrElse("–")</em>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+
+    </div>
+
+    <p>
+      <a href="@routes.Application.products(prismic.maybeRef())">Browse all our products</a>
+    </p>
+
+  </section>
+
+  <section id="featured">
+
+    @featured.filterNot(_.getType() == "blog-post").take(3).map {
+
+      case product if product.getType() == "product" => {
+        <div style="@Option(product.getImage("product.gallery[0]", "squared")).map { img => background-image: url(@img.getUrl()); }">
+          <a href="@routes.Application.productDetail(product.getId(), product.getSlug(), prismic.maybeRef())">
+            <h3><span>@Option(product.getText("product.name")).getOrElse("Product")</span></h3>
+            <p>
+              <span>@product.getText("product.short_lede")</span>
+            </p>
+          </a>
+        </div>
+      }
+
+      case selection if selection.getType() == "selection" => {
+        <div style="@Option(selection.getImage("selection.catcher_image", "squarred")).map { img => background-image: url(@img.getUrl()); }">
+          <a href="@routes.Application.selectionDetail(selection.getId(), selection.getSlug(), prismic.maybeRef())">
+            <h3><span>@Option(selection.getText("selection.name")).getOrElse("Selection")</span></h3>
+            <p>
+              <span>@selection.getText("selection.short_lede")</span>
+            </p>
+          </a>
+        </div>
+      }
+    
+    }
+
+  </section>
+
+  @featured.filter(_.getType() == "blog-post").headOption.map { post =>
+
+    <section id="blog">
+
+      <h2>Fresh news from <a href="@routes.Application.blog(null, prismic.maybeRef())">our blog</a></h2>
+
+      <a href="@routes.Application.blogPost(post.getId(), post.getSlug(), prismic.maybeRef())">
+        @Option(post.getStructuredText("blog-post.body")).flatMap(d => Option(d.getTitle)).map(_.getText()).map { title => <h1>@title</h1> }
+        @Option(post.getStructuredText("blog-post.body")).flatMap(d => Option(d.getFirstParagraph)).map(_.getText()).map { text => <p>@text</p> }
+      </a>
+
+      <a class="more" href="@routes.Application.blogPost(post.getId(), post.getSlug(), prismic.maybeRef())">Read more</a>
+
+    </section>
+
+  }
+
+}

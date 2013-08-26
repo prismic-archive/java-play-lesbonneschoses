@@ -1,0 +1,10 @@
+@(about: io.prismic.Document)
+
+@page(id = "about")(
+  title = Option(about.getText("article.title")), 
+  image = Option(about.getImage("article.image", "main")).map(_.getUrl()), 
+  catcher = Option(about.getHtml("article.short_lede", prismic.getLinkResolver())).map(Html.apply)) {
+
+  @Option(about.getHtml("article.content", prismic.getLinkResolver())).map(Html.apply)
+
+}

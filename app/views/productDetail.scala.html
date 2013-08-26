@@ -1,0 +1,74 @@
+@(product: io.prismic.Document, relatedProducts: java.util.List[io.prismic.Document])
+
+@main(id = "product", title = Option(product.getText("product.name"))) {
+
+  <section id="detail">
+
+    <div>
+
+      <img src="@(Option(product.getImage("product.image", "main")).map(_.getUrl()).getOrElse(routes.Assets.at("images/missing-image.png")))">
+
+      <h4>
+        <strong>@Option(product.getText("product.name")).getOrElse("Missing product name")</strong>
+        @Option(product.getNumber("product.price", "$0.00")).map { price =><em>@price</em>}
+      </h4>
+      
+      <h2>
+        @Option(product.getText("product.short_lede")).orElse(Option(product.getText("product.name"))).getOrElse("Product")
+      </h2>
+
+      @Option(product.getHtml("product.description", prismic.getLinkResolver())).map(Html.apply)
+
+      <p>
+        <a @Option(product.getText("product.flavour")).map { flavour => href="@routes.Application.productsByFlavour(flavour, prismic.maybeRef())"}>
+          <strong class="color" style="background: @product.getText("product.color")">@product.getText("product.color")</strong>
+        </a>
+      </p>
+
+    </div>
+
+    <p>
+      <a href="@routes.Application.products(prismic.maybeRef())">Browse all our products</a>
+    </p>
+
+  </section>
+
+  @Option(product.getImage("product.gallery", "main")).map { img =>
+    <section id="gallery" style="background-image: url(@img.getUrl())"></section>
+  }.getOrElse {
+
+    @for(
+      author <- Option(product.getText("product.testimonial_author")).filterNot(_.isEmpty);
+      quote <- Option(product.getText("product.testimonial_quote")).filterNot(_.isEmpty)
+    ) {
+      <section id="quote">
+        <blockquote>@quote <strong>said @author</strong></blockquote>
+      </section>
+    }
+
+  }
+
+  @Option(relatedProducts).filterNot(_.isEmpty).map {
+    case products => {
+
+      <section id="related" class="products">
+
+        <h2>You might like these as well</h2> 
+
+        <ul>
+          @products.map { product =>
+            <li data-category="@product.getTags().filter(Application.ProductCategories.contains).headOption">
+              <a href="@routes.Application.productDetail(product.getId(), product.getSlug(), prismic.maybeRef())">
+                <img src="@(Option(product.getImage("product.image", "icon")).map(_.getUrl()).getOrElse(routes.Assets.at("images/missing-image.png")))">
+                <span>@Option(product.getText("product.name")).getOrElse("Product")</span>
+                <em>@Option(product.getNumber("product.price", "$0.00")).getOrElse("–")</em>
+              </a>
+            </li>
+          }
+        </ul>
+      </section>
+
+    }
+  }
+
+}

@@ -1,0 +1,69 @@
+@(post: io.prismic.Document, relatedProducts: java.util.List[io.prismic.Document], relatedPosts: java.util.List[io.prismic.Document])
+
+@blog(title = Option(post.getStructuredText("blog-post.body")).flatMap(d => Option(d.getTitle())).map(_.getText())) {
+  
+  <section id="post">
+    
+      <em class="infos">@post.getDate("blog-post.date", "MMMM dd, yyyy") @Option(post.getText("blog-post.author")).map { author => by @author }</em>
+      
+      <article>
+        @Option(post.getHtml("blog-post.body", prismic.getLinkResolver())).map(Html.apply)
+      </article>
+
+      @Option(relatedPosts).filterNot(_.isEmpty).map { posts =>
+
+        <h2>@(posts.size match { case 1 => "This" case _ => "These" }) should interest you too</h2>
+
+        <ul>
+          @posts.map { post =>
+            @Option(post.getStructuredText("blog-post.body")).flatMap(d => Option(d.getTitle())).map(_.getText()).map { title =>
+              <li>
+                <a href="@routes.Application.blogPost(post.getId(), post.getSlug(), prismic.maybeRef())">@title</a>
+              </li>
+            }
+          }
+        </ul>
+
+      }
+
+      @if(post.getBoolean("blog-post.allow_comments")) {
+
+        <h2>Comments</h2>
+
+        <div id="fb-root"></div>
+        <script>(function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) return;
+          js = d.createElement(s); js.id = id;
+          js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));</script>
+
+        <div class="fb-comments" data-href="@prismic.getLinkResolver().resolve(post)" data-width="640" data-num-posts="10"></div>
+
+      }
+
+  </section>
+
+  <aside>
+
+    @Option(relatedProducts).filterNot(_.isEmpty).map { products =>
+
+      <h2>Some pastries you should love</h2>
+
+      <ul>
+        @products.map { product =>
+          <li>
+            <a href="@routes.Application.productDetail(product.getId(), product.getSlug(), prismic.maybeRef())">
+              <img src="@(Option(product.getImage("product.image", "icon")).map(_.getUrl()).getOrElse(routes.Assets.at("images/missing-image.png")))">
+              <span>@Option(product.getText("product.name")).getOrElse("Product")</span>
+            </a>
+          </li>
+        }
+      </ul>
+
+    }
+
+  </aside>
+
+}

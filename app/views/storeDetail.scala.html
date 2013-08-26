@@ -1,0 +1,31 @@
+@(store: io.prismic.Document)
+
+@page(id = "store")(
+  title = Option(store.getText("store.name")), 
+  catcher = Option(store.getHtml("store.description", prismic.getLinkResolver())).map(Html.apply),
+  image = Option(store.getImage("store.image", "main")).map(_.getUrl())) {
+
+  <div id="map-canvas" style="width:400px; height: 300px"></div>
+
+  <p class="address">
+    @Option(store.getText("store.address")).map { txt => @txt<br> }
+    @Option(store.getText("store.address2")).map { txt => @txt<br> }
+    @Option(store.getText("store.city")).map { txt => @txt }
+    @Option(store.getText("store.zipcode")).map { txt => @txt<br> }
+    @store.getText("store.country")
+  </p>  
+
+  <aside>
+
+    <h4>Opening times</h4>
+
+    @scala.collection.immutable.List("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday").map { day =>
+      <dl>
+        <dt>@day</dt>
+        <dd>@store.getText(s"store.${day.toLowerCase}")</dd>
+      </dl>
+    }
+
+  </aside>
+
+}

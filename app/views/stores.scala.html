@@ -1,0 +1,18 @@
+@(main: io.prismic.Document, stores: java.util.List[io.prismic.Document])
+
+@page(id = "stores")(
+  title = Option(main.getText("article.title")), 
+  image = Option(main.getImage("article.image", "main")).map(_.getUrl()), 
+  catcher = Option(main.getHtml("article.short_lede", prismic.getLinkResolver())).map(Html.apply)) {
+
+  @Option(main.getHtml("article.content", prismic.getLinkResolver())).map(Html.apply)
+
+  @stores.sortBy(_.getText("store.name")).map { store => 
+ 
+    <article class="store" style="@Option(store.getImage("store.image", "medium")).map { img => background-image: url(@img.getUrl()) }">
+      <a href="@routes.Application.storeDetail(store.getId(), store.getSlug(), prismic.maybeRef())"><h3>@store.getText("store.name")</h3></a>
+    </article>
+
+  }
+
+}

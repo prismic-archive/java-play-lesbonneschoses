@@ -1,0 +1,34 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+GET     /                                                   controllers.Application.index(ref: String ?= null)
+
+GET     /about                                              controllers.Application.about(ref: String ?= null)
+
+GET     /jobs                                               controllers.Application.jobs(ref: String ?= null)
+GET     /jobs/$id<[-_a-zA-Z0-9]{16}>/:slug                  controllers.Application.jobDetail(id, slug, ref: String ?= null)
+
+GET     /stores                                             controllers.Application.stores(ref: String ?= null)
+GET     /stores/$id<[-_a-zA-Z0-9]{16}>/:slug                controllers.Application.storeDetail(id, slug, ref: String ?= null)
+
+GET     /blog                                               controllers.Application.blog(category: String ?= null, ref: String ?= null)
+GET     /blog/$id<[-_a-zA-Z0-9]{16}>/:slug                  controllers.Application.blogPost(id, slug, ref: String ?= null)
+
+GET     /products                                           controllers.Application.products(ref: String ?= null)
+GET     /products/$id<[-_a-zA-Z0-9]{16}>/:slug              controllers.Application.productDetail(id, slug, ref: String ?= null)
+GET     /products/by-flavour                                controllers.Application.productsByFlavour(flavour, ref: String ?= null)
+
+GET     /selections/$id<[-_a-zA-Z0-9]{16}>/:slug            controllers.Application.selectionDetail(id, slug, ref: String ?= null)
+
+GET     /search                                             controllers.Application.search(query: String ?= null, ref: String ?= null)
+
+GET     /not-found                                          controllers.Application.brokenLink(ref: String ?= null)
+
+# Prismic.io OAuth
+GET     /signin                                             controllers.Prismic.signin
+GET     /auth_callback                                      controllers.Prismic.callback(code: String ?= null, redirect_uri: String ?= null)
+POST    /signout                                            controllers.Prismic.signout()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file                                       controllers.Assets.at(path="/public", file) 

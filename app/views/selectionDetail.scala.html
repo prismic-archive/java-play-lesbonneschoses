@@ -1,0 +1,55 @@
+@(selection: io.prismic.Document, products: java.util.List[io.prismic.Document])
+
+@main(title = Option(selection.getText("selection.name")), id = "selection") {
+
+  <section id="page-header">
+
+    <div style="@Option(selection.getImage("selection.catcher_image", "main")).map(img => s"background-image: url(${img.getUrl()})")">
+      <div>
+        <h1>@selection.getText("selection.name")</h1>
+
+        <p>
+          @selection.getText("selection.short_lede")
+        </p>
+      </div>
+    </div>
+
+  </section>
+
+  <section id="page-body">
+    
+    <img src="@(Option(selection.getImage("selection.image", "main")).map(_.getUrl()).getOrElse(routes.Assets.at("images/missing-image.png")))">
+
+    <div>
+      @Option(selection.getHtml("selection.description", prismic.getLinkResolver())).map(Html.apply)
+
+      <h4>
+        @Option(selection.getNumber("selection.price", "$0.00")).map { price =><em>@price</em>}
+      </h4>
+    </div>
+
+  </section>
+
+  @Option(products).filterNot(_.isEmpty).map {
+    case products => {
+
+      <section class="products">
+
+        <h2>Part of this selection</h2> 
+
+        <ul>
+          @products.map { product =>
+            <li data-category="@product.getTags().filter(Application.ProductCategories.contains).headOption">
+              <a href="@routes.Application.productDetail(product.getId(), product.getSlug(), prismic.maybeRef())">
+                <img src="@(Option(product.getImage("product.image", "icon")).map(_.getUrl()).getOrElse(routes.Assets.at("images/missing-image.png")))">
+                <span>@Option(product.getText("product.name")).getOrElse("Product")</span>
+              </a>
+            </li>
+          }
+        </ul>
+      </section>
+
+    }
+  }
+
+}
