@@ -129,7 +129,7 @@ public class Prismic extends Controller {
     }
 
     // Create the Prismic context
-    Prismic.Context prismicContext = new Prismic.Context(api, ref, accessToken, Application.linkResolver(api, ref, ctx.request()));
+    Prismic.Context prismicContext = new Prismic.Context(api, ref, accessToken, Application.linkResolver(api, ref.equals(api.getMaster().getRef()) ? null : ref, ctx.request()));
 
     // Strore it for future use
     ctx.args.put(PRISMIC_CONTEXT, prismicContext);

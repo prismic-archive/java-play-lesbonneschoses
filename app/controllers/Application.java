@@ -29,7 +29,40 @@ public class Application extends Controller {
     }
 
     public String resolve(Fragment.DocumentLink link) {
-      return "-bla";//routes.Application.detail(link.getId(), link.getSlug(), ref).absoluteURL(request);
+
+      // For "Bookmarked" documents that use a special page
+      if(isBookmark(api, link, "about")) {
+        return routes.Application.about(ref).absoluteURL(request);
+      }
+      else if(isBookmark(api, link, "jobs")) {
+        return routes.Application.jobs(ref).absoluteURL(request);
+      }
+      else if(isBookmark(api, link, "stores")) {
+        return routes.Application.stores(ref).absoluteURL(request);
+      }
+
+      // Store documents
+      else if("store".equals(link.getType()) && !link.isBroken()) {
+        return routes.Application.storeDetail(link.getId(), link.getSlug(), ref).absoluteURL(request);
+      }
+
+      // Any product
+      else if("product".equals(link.getType()) && !link.isBroken()) {
+        return routes.Application.productDetail(link.getId(), link.getSlug(), ref).absoluteURL(request);
+      } 
+
+      // Job offers
+      else if("job-offer".equals(link.getType()) && !link.isBroken()) {
+        return routes.Application.jobDetail(link.getId(), link.getSlug(), ref).absoluteURL(request);
+      } 
+
+      // Blog
+      else if("blog-post".equals(link.getType()) && !link.isBroken()) {
+        return routes.Application.blogPost(link.getId(), link.getSlug(), ref).absoluteURL(request);
+      } 
+
+      // Any other link
+      return routes.Application.brokenLink(ref).absoluteURL(request);
     }
   }
 
