@@ -89,7 +89,7 @@ public class Application extends Controller {
 
   @Prismic.Action
   public static Result about(String ref) {
-    Document aboutPage = getBookmark(prismic(), "about");
+    Document aboutPage = prismic().getBookmark("about");
     if(aboutPage == null) {
       return pageNotFound();
     } else {
@@ -101,7 +101,7 @@ public class Application extends Controller {
 
   @Prismic.Action
   public static Result jobs(String ref) {
-    Document jobsPage = getBookmark(prismic(), "jobs");
+    Document jobsPage = prismic().getBookmark("jobs");
     if(jobsPage == null) {
       return pageNotFound();
     } else {
@@ -112,12 +112,12 @@ public class Application extends Controller {
 
   @Prismic.Action
   public static Result jobDetail(String id, String slug, String ref) {
-    Document jobsPage = getBookmark(prismic(), "jobs");
+    Document jobsPage = prismic().getBookmark("jobs");
     if(jobsPage == null) {
       return pageNotFound();
     } else {
-      Document job = getDocument(prismic(), id);
-      String checked = checkSlug(job, slug);
+      Document job = prismic().getDocument(id);
+      String checked = prismic().checkSlug(job, slug);
       if(checked == DOCUMENT_NOT_FOUND) {
         return pageNotFound();
       }
@@ -134,7 +134,7 @@ public class Application extends Controller {
 
   @Prismic.Action
   public static Result stores(String ref) {
-    Document storesPage = getBookmark(prismic(), "stores");
+    Document storesPage = prismic().getBookmark("stores");
     if(storesPage == null) {
       return pageNotFound();
     } else {
@@ -145,8 +145,8 @@ public class Application extends Controller {
 
   @Prismic.Action
   public static Result storeDetail(String id, String slug, String ref) {
-    Document store = getDocument(prismic(), id);
-    String checked = checkSlug(store, slug);
+    Document store = prismic().getDocument(id);
+    String checked = prismic().checkSlug(store, slug);
     if(checked == DOCUMENT_NOT_FOUND) {
       return pageNotFound();
     }
@@ -162,8 +162,8 @@ public class Application extends Controller {
 
   @Prismic.Action
   public static Result selectionDetail(String id, String slug, String ref) {
-    Document selection = getDocument(prismic(), id);
-    String checked = checkSlug(selection, slug);
+    Document selection = prismic().getDocument(id);
+    String checked = prismic().checkSlug(selection, slug);
     if(checked == DOCUMENT_NOT_FOUND) {
       return pageNotFound();
     }
@@ -175,7 +175,7 @@ public class Application extends Controller {
           productIds.add(link.getId());
         }
       }
-      List<Document> products = getDocuments(prismic(), productIds);
+      List<Document> products = prismic().getDocuments(productIds);
       return ok(views.html.selectionDetail.render(selection, products));
     }
     else {
@@ -211,8 +211,8 @@ public class Application extends Controller {
 
   @Prismic.Action
   public static Result blogPost(String id, String slug, String ref) {
-    Document post = getDocument(prismic(), id);
-    String checked = checkSlug(post, slug);
+    Document post = prismic().getDocument(id);
+    String checked = prismic().checkSlug(post, slug);
     if(checked == DOCUMENT_NOT_FOUND) {
       return pageNotFound();
     }
@@ -224,7 +224,7 @@ public class Application extends Controller {
           productIds.add(link.getId());
         }
       }
-      List<Document> relatedProducts = getDocuments(prismic(), productIds);
+      List<Document> relatedProducts = prismic().getDocuments(productIds);
 
       List<String> postIds = new ArrayList<String>();
       for(Fragment fragment: post.getAll("blog-post.relatedpost")) {
@@ -233,7 +233,7 @@ public class Application extends Controller {
           postIds.add(link.getId());
         }
       }
-      List<Document> relatedPosts = getDocuments(prismic(), postIds);
+      List<Document> relatedPosts = prismic().getDocuments(postIds);
 
       return ok(views.html.postDetail.render(post, relatedProducts, relatedPosts));
     }
@@ -259,8 +259,8 @@ public class Application extends Controller {
 
   @Prismic.Action
   public static Result productDetail(String id, String slug, String ref) {
-    Document product = getDocument(prismic(), id);
-    String checked = checkSlug(product, slug);
+    Document product = prismic().getDocument(id);
+    String checked = prismic().checkSlug(product, slug);
     if(checked == DOCUMENT_NOT_FOUND) {
       return pageNotFound();
     }
@@ -272,7 +272,7 @@ public class Application extends Controller {
           productIds.add(link.getId());
         }
       }
-      List<Document> relatedProducts = getDocuments(prismic(), productIds);
+      List<Document> relatedProducts = prismic().getDocuments(productIds);
 
       return ok(views.html.productDetail.render(product, relatedProducts));
     }
