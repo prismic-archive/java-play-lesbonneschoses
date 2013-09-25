@@ -1,10 +1,11 @@
 import play.*;
 import play.mvc.*;
+import play.libs.F.*;
 
 public class Global extends GlobalSettings {
 
-  public SimpleResult onHandlerNotFound(Http.RequestHeader request) {
-    System.out.println(Http.Context.current());
+  public Promise<SimpleResult> onHandlerNotFound(Http.RequestHeader request) {
+    // TODO
     return null;
   }
 
