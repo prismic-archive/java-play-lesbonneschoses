@@ -2,33 +2,30 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET     /                                                   controllers.Application.index(ref: String ?= null)
+GET        /                                               controllers.Application.index()
 
-GET     /about                                              controllers.Application.about(ref: String ?= null)
+GET        /about                                          controllers.Application.about()
 
-GET     /jobs                                               controllers.Application.jobs(ref: String ?= null)
-GET     /jobs/$id<[-_a-zA-Z0-9]{16}>/:slug                  controllers.Application.jobDetail(id, slug, ref: String ?= null)
+GET        /jobs                                           controllers.Application.jobs()
+GET        /jobs/$id<[-_a-zA-Z0-9]{16}>/:slug              controllers.Application.jobDetail(id, slug)
 
-GET     /stores                                             controllers.Application.stores(ref: String ?= null)
-GET     /stores/$id<[-_a-zA-Z0-9]{16}>/:slug                controllers.Application.storeDetail(id, slug, ref: String ?= null)
+GET        /stores                                         controllers.Application.stores()
+GET        /stores/$id<[-_a-zA-Z0-9]{16}>/:slug            controllers.Application.storeDetail(id, slug)
 
-GET     /blog                                               controllers.Application.blog(category: String ?= null, ref: String ?= null)
-GET     /blog/$id<[-_a-zA-Z0-9]{16}>/:slug                  controllers.Application.blogPost(id, slug, ref: String ?= null)
+GET        /blog                                           controllers.Application.blog(category: String ?= null)
+GET        /blog/$id<[-_a-zA-Z0-9]{16}>/:slug              controllers.Application.blogPost(id, slug)
 
-GET     /products                                           controllers.Application.products(ref: String ?= null)
-GET     /products/$id<[-_a-zA-Z0-9]{16}>/:slug              controllers.Application.productDetail(id, slug, ref: String ?= null)
-GET     /products/by-flavour                                controllers.Application.productsByFlavour(flavour, ref: String ?= null)
+GET        /products                                       controllers.Application.products()
+GET        /products/$id<[-_a-zA-Z0-9]{16}>/:slug          controllers.Application.productDetail(id, slug)
+GET        /products/by-flavour                            controllers.Application.productsByFlavour(flavour)
 
-GET     /selections/$id<[-_a-zA-Z0-9]{16}>/:slug            controllers.Application.selectionDetail(id, slug, ref: String ?= null)
+GET        /selections/$id<[-_a-zA-Z0-9]{16}>/:slug        controllers.Application.selectionDetail(id, slug)
 
-GET     /search                                             controllers.Application.search(query: String ?= null, ref: String ?= null)
+GET        /search                                         controllers.Application.search(query: String ?= null)
 
-GET     /not-found                                          controllers.Application.brokenLink(ref: String ?= null)
+GET        /not-found                                      controllers.Application.brokenLink()
 
-# Prismic.io OAuth
-GET     /signin                                             controllers.Prismic.signin
-GET     /auth_callback                                      controllers.Prismic.callback(code: String ?= null, redirect_uri: String ?= null)
-POST    /signout                                            controllers.Prismic.signout()
+GET        /preview                                        controllers.Prismic.preview(token: String)
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file                                       controllers.Assets.at(path="/public", file) 
+GET        /assets/*file                                   controllers.Assets.at(path="/public", file)

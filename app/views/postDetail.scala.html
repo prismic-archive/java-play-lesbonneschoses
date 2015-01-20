@@ -18,7 +18,7 @@
           @posts.map { post =>
             @Option(post.getStructuredText("blog-post.body")).flatMap(d => Option(d.getTitle())).map(_.getText()).map { title =>
               <li>
-                <a href="@routes.Application.blogPost(post.getId(), post.getSlug(), prismic.maybeRef())">@title</a>
+                <a href="@routes.Application.blogPost(post.getId(), post.getSlug())">@title</a>
               </li>
             }
           }
@@ -54,7 +54,7 @@
       <ul>
         @products.map { product =>
           <li>
-            <a href="@routes.Application.productDetail(product.getId(), product.getSlug(), prismic.maybeRef())">
+            <a href="@routes.Application.productDetail(product.getId(), product.getSlug())">
               <img src="@(Option(product.getImage("product.image", "icon")).map(_.getUrl()).getOrElse(routes.Assets.at("images/missing-image.png")))">
               <span>@Option(product.getText("product.name")).getOrElse("Product")</span>
             </a>

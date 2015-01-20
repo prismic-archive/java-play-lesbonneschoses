@@ -9,6 +9,7 @@ import java.util.*;
 import java.lang.annotation.*;
 
 import io.prismic.*;
+import scala.NotImplementedError;
 
 public class Prismic extends Controller {
 
@@ -48,15 +49,6 @@ public class Prismic extends Controller {
     return value;
   }
 
-  // Compute the callback URL to use for the OAuth worklow
-  public static String callbackUrl(Http.Request request) {
-    String[] referer = request.headers().get("referer");
-    if(referer == null) {
-      referer = new String[0];
-    }
-    return routes.Prismic.callback(null, referer.length > 0 ? referer[0] : null).absoluteURL(request);
-  }
-
   // -- Fetch the API entry document
   public static Api getApiHome(String accessToken) {
     return Api.get(config("prismic.api"), accessToken, CACHE, LOGGER);
@@ -92,20 +84,16 @@ public class Prismic extends Controller {
       return linkResolver;
     }
 
-    public String maybeRef() {
-      if(ref.equals(api.getMaster().getRef())) {
-        return null;
-      }
-      return ref;
-    }
-
     public boolean hasPrivilegedAccess() {
       return accessToken != null;
     }
 
     // -- Helper: Retrieve a single document by Id
     public Document getDocument(String id) {
-      List<Document> results = this.getApi().getForm("everything").query("[[:d = at(document.id, \"" + id + "\")]]").ref(this.getRef()).submit();
+      List<Document> results = this.getApi().getForm("everything")
+        .query(Predicates.at("document.id", id))
+        .ref(this.getRef())
+        .submit().getResults();
       if(results.size() > 0) {
         return results.get(0);
       }
@@ -125,7 +113,7 @@ public class Prismic extends Controller {
           sep = ",";
         }
         q.append("])]]");
-        return this.getApi().getForm("everything").query(q.toString()).ref(this.getRef()).submit();
+        return this.getApi().getForm("everything").query(q.toString()).ref(this.getRef()).submit().getResults();
       }
     }
 
@@ -174,10 +162,14 @@ public class Prismic extends Controller {
     // Reetrieve the API
     Api api = getApiHome(accessToken);
 
-    // Reuse the ref from the incoming request or use master ref
-    String ref = ctx.request().getQueryString("ref");
-    if(ref == null || ref.trim().isEmpty()) {
-      ref = api.getMaster().getRef();
+    // Use the ref from the preview cookie, experiment cookie or master
+    String ref = api.getMaster().getRef();
+    Http.Cookie previewCookie = ctx.request().cookie(io.prismic.Prismic.PREVIEW_COOKIE);
+    Http.Cookie experimentCookie = ctx.request().cookie(io.prismic.Prismic.EXPERIMENTS_COOKIE);
+    if (previewCookie != null) {
+      ref = previewCookie.value();
+    } else if (experimentCookie != null) {
+      ref = api.getExperiments().refFromCookie(experimentCookie.value());
     }
 
     // Create the Prismic context
@@ -195,7 +187,7 @@ public class Prismic extends Controller {
 
   public static class ActionImpl extends play.mvc.Action<Prismic.Action> {
 
-    public F.Promise<SimpleResult> call(Http.Context ctx) throws Throwable {
+    public F.Promise<Result> call(Http.Context ctx) throws Throwable {
       buildContext(ctx);
 
       // Go!
@@ -204,57 +196,15 @@ public class Prismic extends Controller {
 
   }
 
-
   // --
-  // -- OAuth actions
+  // -- Previews
   // --
-
   @Prismic.Action
-  public static Result signin() throws Exception {
-    StringBuilder url = new StringBuilder();
-    url.append(prismic().getApi().getOAuthInitiateEndpoint());
-    url.append("?");
-    url.append("client_id=");
-    url.append(URLEncoder.encode(config("prismic.clientId"), "utf-8"));
-    url.append("&redirect_uri=");
-    url.append(URLEncoder.encode(callbackUrl(ctx().request()), "utf-8"));
-    url.append("&scope=");
-    url.append(URLEncoder.encode("master+releases", "utf-8"));
-    return redirect(url.toString());
-  }
-
-  public static Result signout() {
-    session().clear();
-    return redirect(routes.Application.index(null));
-  }
-
-  @Prismic.Action
-  public static Result callback(String code, String redirect_uri) throws Exception {
-    StringBuilder body = new StringBuilder();
-    body.append("grant_type=");
-    body.append(URLEncoder.encode("authorization_code", "utf-8"));
-    body.append("&code=");
-    body.append(URLEncoder.encode(code, "utf-8"));
-    body.append("&redirect_uri=");
-    body.append(URLEncoder.encode(callbackUrl(ctx().request()), "utf-8"));
-    body.append("&client_id=");
-    body.append(URLEncoder.encode(config("prismic.clientId"), "utf-8"));
-    body.append("&client_secret=");
-    body.append(URLEncoder.encode(config("prismic.clientSecret"), "utf-8")); 
-    WS.Response response = WS.url(prismic().getApi().getOAuthTokenEndpoint()).setHeader(CONTENT_TYPE, "application/x-www-form-urlencoded").post(body.toString()).get();
-    if(response.getStatus() == 200) {
-      String accessToken = response.asJson().path("access_token").asText();
-      String redirectUrl = redirect_uri;
-      if(redirectUrl == null) {
-        redirectUrl = routes.Application.index(null).url();
-      }
-      session(ACCESS_TOKEN, accessToken);
-      return redirect(redirectUrl);
-    }
-    else {
-      play.Logger.of("prismic").error("Can't retrieve the OAuth token for code " + code + ": " + response.getStatus() + " " + response.getBody());
-      return unauthorized("Can't sign you in");
-    }
+  public static Result preview(String token) {
+    String indexUrl = controllers.routes.Application.index().url();
+    String url = prismic().api.previewSession(token, prismic().getLinkResolver(), indexUrl);
+    response().setCookie(io.prismic.Prismic.PREVIEW_COOKIE, token, 1800);
+    return redirect(url);
   }
 
 }

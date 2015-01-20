@@ -26,7 +26,7 @@
       <div class="listing">
       @jobs.map { job =>
         <div class="job">
-          <a href="@routes.Application.jobDetail(job.getId(), job.getSlug(), prismic.maybeRef())">
+          <a href="@routes.Application.jobDetail(job.getId(), job.getSlug())">
             <h3>@job.getText("job-offer.name")</h3>
             <p>
               @Option(job.getStructuredText("job-offer.profile")).flatMap(d => Option(d.getFirstParagraph())).map(_.getText())

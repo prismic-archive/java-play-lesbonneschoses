@@ -6,7 +6,7 @@
     @posts.take(10).map { post =>
 
       <article>
-        <a href="@routes.Application.blogPost(post.getId(), post.getSlug(), prismic.maybeRef())">
+        <a href="@routes.Application.blogPost(post.getId(), post.getSlug())">
           <em class="infos">@post.getDate("blog-post.date", "MMMM dd, yyyy") @Option(post.getText("blog-post.author")).map { author => by @author }</em>
           @Option(post.getStructuredText("blog-post.body")).flatMap(d => Option(d.getTitle())).map(_.getText()).map { title => <h2>@title</h2> }
           

@@ -20,7 +20,7 @@
       @Option(product.getHtml("product.description", prismic.getLinkResolver())).map(Html.apply)
 
       <p>
-        <a @Option(product.getText("product.flavour")).map { flavour => href="@routes.Application.productsByFlavour(flavour, prismic.maybeRef())"}>
+        <a @Option(product.getText("product.flavour")).map { flavour => href="@routes.Application.productsByFlavour(flavour)"}>
           <strong class="color" style="background: @product.getText("product.color")">@product.getText("product.color")</strong>
         </a>
       </p>
@@ -28,7 +28,7 @@
     </div>
 
     <p>
-      <a href="@routes.Application.products(prismic.maybeRef())">Browse all our products</a>
+      <a href="@routes.Application.products()">Browse all our products</a>
     </p>
 
   </section>
@@ -58,7 +58,7 @@
         <ul>
           @products.map { product =>
             <li data-category="@product.getTags().filter(Application.ProductCategories.contains).headOption">
-              <a href="@routes.Application.productDetail(product.getId(), product.getSlug(), prismic.maybeRef())">
+              <a href="@routes.Application.productDetail(product.getId(), product.getSlug())">
                 <img src="@(Option(product.getImage("product.image", "icon")).map(_.getUrl()).getOrElse(routes.Assets.at("images/missing-image.png")))">
                 <span>@Option(product.getText("product.name")).getOrElse("Product")</span>
                 <em>@Option(product.getNumber("product.price", "$0.00")).getOrElse("–")</em>

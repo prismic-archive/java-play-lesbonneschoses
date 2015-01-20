@@ -40,7 +40,7 @@
         <ul>
           @products.map { product =>
             <li data-category="@product.getTags().filter(Application.ProductCategories.contains).headOption">
-              <a href="@routes.Application.productDetail(product.getId(), product.getSlug(), prismic.maybeRef())">
+              <a href="@routes.Application.productDetail(product.getId(), product.getSlug())">
                 <img src="@(Option(product.getImage("product.image", "icon")).map(_.getUrl()).getOrElse(routes.Assets.at("images/missing-image.png")))">
                 <span>@Option(product.getText("product.name")).getOrElse("Product")</span>
               </a>

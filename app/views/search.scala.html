@@ -9,7 +9,7 @@
 
   <section>
 
-    <form action="@routes.Application.search(prismic.maybeRef())" method="GET">
+    <form action="@routes.Application.search()" method="GET">
       <input type="text" name="query" placeholder="Search anything" value="@query" autocomplete="off">
       <input type="submit" value="Submit">
     </form>
@@ -29,7 +29,7 @@
 
             case product if product.getType() == "product" => {
               <li>
-                <a href="@routes.Application.productDetail(product.getId(), product.getSlug(), prismic.maybeRef())">
+                <a href="@routes.Application.productDetail(product.getId(), product.getSlug())">
                   <img src="@(Option(product.getImage("product.image", "icon")).map(_.getUrl()).getOrElse(routes.Assets.at("images/missing-image.png")))">
                   <span>@Option(product.getText("product.name")).getOrElse("Product")</span>
                 </a>
@@ -38,7 +38,7 @@
 
             case selection if selection.getType() == "selection" => {
               <li>
-                <a href="@routes.Application.selectionDetail(selection.getId(), selection.getSlug(), prismic.maybeRef())">
+                <a href="@routes.Application.selectionDetail(selection.getId(), selection.getSlug())">
                   <img src="@(Option(selection.getImage("selection.image", "icon")).map(_.getUrl()).getOrElse(routes.Assets.at("images/missing-image.png")))">
                   <span>@Option(selection.getText("selection.name")).getOrElse("Product selection")</span>
                 </a>
@@ -120,7 +120,7 @@
           <h2>No results found</h2>
 
           <p>
-            Do you want to browse our <a href="@routes.Application.products(prismic.maybeRef())">products catalog</a>?
+            Do you want to browse our <a href="@routes.Application.products()">products catalog</a>?
           </p>
 
         </div>
